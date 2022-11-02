@@ -5,6 +5,9 @@ set parsers [dict create \
     {M} {parse_M}
 ]
 
+set SOUTHERN_HEMISPHERE S
+set WESTERN_HEMISPHERE W
+
 # parse_packet_type --
 #
 # Parses the packet and retrieves it's type
@@ -73,6 +76,8 @@ proc parse_M {packet} {
 #       Dict with keys: type, datetime (iso format), lat11, lat2, lon1, lon2
 #       course, speed, height and stats
 proc parse_SD {packet} {
+    global SOUTHERN_HEMISPHERE
+    global WESTERN_HEMISPHERE
 
     # Packet example: #SD#04012011;135515;5544.6025;N;03739.6834;E;35;215;110;7\r\n
     set packet_pattern {^#SD#([\d]{8});([\d]{6});([\d]{4}\.?[\d]{0,});([NS]);([\d]{5}\.?[\d]{0,});([EW]);([\d]+);([\d]+);([\d]+);([\d]+)\r\n$}
@@ -90,14 +95,15 @@ proc parse_SD {packet} {
     if {$parsed_time eq {}} {
         error "Error: invalid time format"
     }
+    
+    set lat_sign [expr [string equal $SOUTHERN_HEMISPHERE $lat2] == 1 ? -1 : 1]
+    set lon_sign [expr [string equal $WESTERN_HEMISPHERE $lon2] == 1 ? -1 : 1]
 
     return [dict create \
         type "SD" \
         datetime "${parsed_date}T${parsed_time}" \
-        lat1 [scan $lat1 {%f}] \
-        lat2 $lat2 \
-        lon1 [scan $lon1 {%f}] \
-        lon2 $lon2 \
+        lat [expr [scan $lat1 {%f}] * $lat_sign] \
+        lon [expr [scan $lon1 {%f}] * $lon_sign] \
         speed $speed \
         course $course \
         height $height \
