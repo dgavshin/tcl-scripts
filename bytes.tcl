@@ -4,7 +4,7 @@ set data [expr 0x5FABFF01]
 
 puts "Input: [format "0b%b" [expr $data]]"
 
-set second_byte [expr ($data >> 8 * 1) & 0xff]
+set second_byte [expr ($data >> 8) & 0xff]
 set inversed_seventh_bit [expr !(($data & 0xff) >> 7)]
 set mirrored_17_20_bits [expr \
     (($data >> 17) & 1) << 3 | \
