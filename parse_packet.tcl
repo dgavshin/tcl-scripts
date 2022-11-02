@@ -20,8 +20,8 @@ set WESTERN_HEMISPHERE W
 proc parse_packet_type {packet} {
     set type_pattern {^#([A-Z]+)#.+\r\n$}
 
-    if {[regexp $type_pattern $packet all type] == 0} {
-        error "Error: Packet does not match regex pattern, failed to get package type"
+    if {[regexp $type_pattern $packet all type] eq 0} {
+        error "Error: Packet does not match regex pattern, failed to get packet type"
     }
     return $type
 }
